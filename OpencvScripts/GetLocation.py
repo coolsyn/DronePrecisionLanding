@@ -1,47 +1,29 @@
-# encoding: utf-8
+import cv2 
+import cv2.aruco as aruco
 import numpy as np
-import time
-import cv2  
-import cv2.aruco as aruco  
 
+#相机标定矩阵
 mtx = np.array([
         [964.65,       0, 527.526],
         [      0, 962.454, 358.1611],
         [      0,       0,       1],
         ])
-
-
-
 dist = np.array( [-1.25332777e-01, 1.07327000e+00, -1.52290760e-03, 1.76339938e-03, -2.57610603e+00] )
 
-
-
-cap = cv2.VideoCapture(0)
-
-
-font = cv2.FONT_HERSHEY_SIMPLEX #font for displaying 
-
-#num = 0
+cap = cv2.VideoCapture(0)#捕获视频
+font = cv2.FONT_HERSHEY_SIMPLEX #字体
+pi=3.1415926
 while True:  
-    ret, frame = cap.read()  
-    # operations on the frame come here  
-    
+    ret, frame = cap.read()   
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  
-    #aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_1000)
     aruco_dict = aruco.Dictionary_get(aruco.DICT_APRILTAG_36H11)
     parameters =  aruco.DetectorParameters_create()  
-  
-    '''
-    detectMarkers(...) 
-        detectMarkers(image, dictionary[, corners[, ids[, parameters[, rejectedI 
-        mgPoints]]]]) -> corners, ids, rejectedImgPoints 
-    '''  
       
     #lists of ids and the corners beloning to each id  
     corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, 
                                                           aruco_dict, 
                                                           parameters=parameters)  
-
+  
 #    if ids != None: 
     if ids is not None:
           
@@ -49,13 +31,17 @@ while True:
         # Estimate pose of each marker and return the values rvet and tvec---different 
         # from camera coeficcients  
         (rvec-tvec).any() # get rid of that nasty numpy value array error  
-        print(tvec)#打印三个轴方向上的偏移矩阵
+        #print("tecv:"+str(tvec))
+        degree=rvec*180/pi
+        print("recv:"+str(degree))
+
+#        aruco.drawAxis(frame, mtx, dist, rvec, tvec, 0.1) #Draw Axis  
+#        aruco.drawDetectedMarkers(frame, corners) #Draw A square around the markers
+        
         for i in range(rvec.shape[0]):
             aruco.drawAxis(frame, mtx, dist, rvec[i, :, :], tvec[i, :, :], 0.03)
             aruco.drawDetectedMarkers(frame, corners, ids)
-            #获取中心的（x，y）坐标
-            #x=int(corners[i][0][0][0]+corners[i][0][1][0]+corners[i][0][3][0]+corners[i][0][2][0])/4
-            #y=int(corners[i][0][0][1]+corners[i][0][1][1]+corners[i][0][3][1]+corners[i][0][2][1])/4
+  
   
   
     else:  

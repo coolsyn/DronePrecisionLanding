@@ -1,6 +1,25 @@
 import PIL.Image as Image
 import os
-  
+import numpy as np
+import cv2
+import cv2.aruco as aruco
+#导入库
+#生成多个tag文件
+color=[255,255,255]#边框颜色为白色
+font = cv2.FONT_HERSHEY_SIMPLEX#设置字体
+aruco_dict = aruco.Dictionary_get(aruco.DICT_APRILTAG_36H11)#字典为AprilTag
+img = np.random.random((200,200))#设置图片大小
+for i in range(25):#生成id：0-24的图片
+    img=aruco.drawMarker(aruco_dict, i, 200, img, 1)#生成图片
+    img_bor=cv2.copyMakeBorder(img,200,200,200,200,cv2.BORDER_CONSTANT,value=color)#生成边框
+    text='id:'+str(i)#添加文本字符串
+    img_bor=cv2.putText(img_bor,text,(280,500),font,1,(0,0,0),2)#添加文本
+    FilePath='/Users/sunyunong/Downloads/Arucotags/'+str(i)+'.jpg'#文件路径
+    cv2.imwrite(fileDir,img_bor)#保存文件
+cv2.waitKey(1)
+cv2.destroyAllWindows()
+
+#拼接tags文件
 IMAGES_PATH = '/Users/sunyunong/Downloads/Arucotags/' # 图片集地址
 IMAGES_FORMAT = ['.jpg', '.JPG'] # 图片格式
 IMAGE_SIZE = 240 # 每张小图片的大小
@@ -8,9 +27,8 @@ IMAGE_ROW = 5 # 图片间隔，也就是合并成一张图后，一共有几行
 IMAGE_COLUMN = 5 # 图片间隔，也就是合并成一张图后，一共有几列
 IMAGE_SAVE_PATH = '/Users/sunyunong/Downloads/final.jpg' # 图片转换后的地址
 image_names=[]
-#顺序排列list中的元素
 
-for i in range(25):
+for i in range(25):#顺序排列list中的元素
     image_names.append(str(i)+'.jpg')
 
 # 获取图片集地址下的所有图片名称
